@@ -2,6 +2,7 @@ package com.secure;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,13 +36,15 @@ public class SecureController {
                 PublicKey publicKey = ac.getPublic("/home/pradeep/KeyPair/client1/publicKey");
                 headers.add("Authorization", "Basic " + ac.encryptText(environment.getProperty(requestDto.getVendor() + ".token"), publicKey));
                 headers.add("Content-Type", "application/json");
-                restTemplate.postForObject(environment.getProperty(requestDto.getVendor() + ".url"), ac.encryptText(requestDto.getData(), publicKey), Boolean.class);
+                HttpEntity<String> request = new HttpEntity<>(ac.encryptText(requestDto.getData(), publicKey), headers);
+                restTemplate.postForObject(environment.getProperty(requestDto.getVendor() + ".url"), request, Boolean.class);
                 break;
             case CLIENT2:
                 publicKey = ac.getPublic("/home/pradeep/KeyPair/client2/publicKey");
                 headers.add("Authorization", "Basic " + ac.encryptText(environment.getProperty(requestDto.getVendor() + ".token"), publicKey));
                 headers.add("Content-Type", "application/json");
-                restTemplate.postForObject(environment.getProperty(requestDto.getVendor() + ".url"), ac.encryptText(requestDto.getData(), publicKey), Boolean.class);
+                request = new HttpEntity<>(ac.encryptText(requestDto.getData(), publicKey), headers);
+                restTemplate.postForObject(environment.getProperty(requestDto.getVendor() + ".url"), request, Boolean.class);
                 break;
         }
 
